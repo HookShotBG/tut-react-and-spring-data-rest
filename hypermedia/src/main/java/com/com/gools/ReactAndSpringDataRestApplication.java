@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.greglturnquist.payroll;
+package com.com.gools;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/**
- * @author Greg Turnquist
- */
-// tag::code[]
+
 @SpringBootApplication
 public class ReactAndSpringDataRestApplication {
 
@@ -29,4 +26,3 @@ public class ReactAndSpringDataRestApplication {
 		SpringApplication.run(ReactAndSpringDataRestApplication.class, args);
 	}
 }
-// end::code[]

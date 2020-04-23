@@ -15,6 +15,8 @@
  */
 package com.greglturnquist.payroll;
 
+import com.com.gools.repo.DepRepository;
+import com.com.gools.repo.DepTaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Component;
 public class DatabaseLoader implements CommandLineRunner {
 
 	private final EmployeeRepository repository;
+
 
 	@Autowired
 	public DatabaseLoader(EmployeeRepository repository) {
@@ -42,6 +45,7 @@ public class DatabaseLoader implements CommandLineRunner {
 		this.repository.save(new Employee("Samwise", "Gamgee", "gardener"));
 		this.repository.save(new Employee("Meriadoc", "Brandybuck", "pony rider"));
 		this.repository.save(new Employee("Peregrin", "Took", "pipe smoker"));
+
 	}
 }
 // end::code[]
