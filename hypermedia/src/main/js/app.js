@@ -12,7 +12,7 @@ class App extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.state = {employees: [], attributes: [], pageSize: 2, links: {}};
+		this.state = {employees: [], attributes: [], pageSize: 2, links: {}, deps: []};
 		this.updatePageSize = this.updatePageSize.bind(this);
 		this.onCreate = this.onCreate.bind(this);
 		this.onDelete = this.onDelete.bind(this);
@@ -22,7 +22,7 @@ class App extends React.Component {
 	// tag::follow-2[]
 	loadFromServer(pageSize) {
 		follow(client, root, [
-			{rel: 'employees', params: {size: pageSize}}]
+			{rel: 'employees', params: {size: pageSize}}, {rel: 'deps', params: {size: pageSize}}]
 		).then(employeeCollection => {
 			return client({
 				method: 'GET',
@@ -95,6 +95,11 @@ class App extends React.Component {
 
 	// tag::follow-1[]
 	componentDidMount() {
+
+		client({method: 'GET', path: '/api/deps'}).done(response => {
+			this.setState({dep: response.entity._embedded.dep});
+		});
+
 		this.loadFromServer(this.state.pageSize);
 	}
 	// end::follow-1[]
@@ -102,6 +107,7 @@ class App extends React.Component {
 	render() {
 		return (
 			<div>
+				<DepList deps={this.state.deps} />
 				<CreateDialog attributes={this.state.attributes} onCreate={this.onCreate}/>
 				<EmployeeList employees={this.state.employees}
 							  links={this.state.links}
@@ -109,8 +115,51 @@ class App extends React.Component {
 							  onNavigate={this.onNavigate}
 							  onDelete={this.onDelete}
 							  updatePageSize={this.updatePageSize}/>
+
+
 			</div>
 		)
+	}
+}
+
+class DepList extends React.Component {
+	render() {
+		const deps = this.props.dep.map(dep =>
+			<Dep key={dep._links.self.href} dep={dep}/>
+		);
+		return (
+			<table>
+				<tbody>
+				<tr>
+					<th>Id</th>
+					<th>Start date</th>
+					<th>End date</th>
+					<th>Comments</th>
+					<th>Location</th>
+					<th>Location name</th>
+					<th>Release</th>
+				</tr>
+				{deps}
+				</tbody>
+			</table>
+		)
+	}
+}
+
+class Dep extends React.Component {
+	render(){
+		return(
+			<tr>
+				<td>{this.props.dep.id}</td>
+				<td>{this.props.dep.start_date}</td>
+				<td>{this.props.dep.end_date}</td>
+				<td>{this.props.dep.comments}</td>
+				<td>{this.props.dep.location}</td>
+				<td>{this.props.dep.location.name}</td>
+				<td>{this.props.dep.release}</td>
+			</tr>
+
+		);
 	}
 }
 

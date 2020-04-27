@@ -15,8 +15,6 @@
  */
 package com.greglturnquist.payroll;
 
-import com.com.gools.repo.DepRepository;
-import com.com.gools.repo.DepTaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
