@@ -4,26 +4,64 @@
 const React = require('react'); // <1>
 const ReactDOM = require('react-dom'); // <2>
 const client = require('./client'); // <3>
-// end::vars[]
+const follow = require('./follow');
 
-// tag::app[]
+var root = '/api';
+
 class App extends React.Component { // <1>
 
 	constructor(props) {
 		super(props);
-		this.state = {deps: []};
+		this.state = {deps: [], attributes: [], links: {}};
+	}
+
+	loadFromServer() {
+		follow(client, root, ["deps"]
+		).then(depCollection => {
+			return client({
+				method: 'GET',
+				path: depCollection.entity._links.profile.href,
+				headers: {'Accept': 'application/schema+json'}
+			}).then(schema => {
+				this.schema = schema.entity;
+				return depCollection;
+			});
+		}).done(depCollection => {
+			this.setState({
+				deps: depCollection.entity._embedded.deps,
+				attributes: Object.keys(this.schema.properties),
+				links: depCollection.entity._links});
+		});
 	}
 
 	componentDidMount() { // <2>
-		client({method: 'GET', path: '/api/deps'}).done(response => {
+		/*client({method: 'GET', path: '/api/deps'}).done(response => {
 			this.setState({deps: response.entity._embedded.deps});
+		});*/
+		this.loadFromServer();
+
+	}
+
+
+	onCreate(newDep) {
+		follow(client, root, ['deps']).then(depCollection => {
+			return client({
+				method: 'POST',
+				path: depCollection.entity._links.self.href,
+				entity: newDep,
+				headers: {'Content-Type': 'application/json'}
+			})
+		}).done(response => {
+			return follow(client, root, ["deps"]);
 		});
 	}
 
 	render() { // <3>
 		return (
 			<div>
-				<DepList deps={this.state.deps} />
+				<CreateDialog attributes={this.state.attributes} onCreate={this.onCreate}/>
+				 <DepList deps={this.state.deps} />
+				<DepList deps={this.state.depL} />
 			</div>
 		)
 	}
@@ -167,6 +205,59 @@ class Dep extends React.Component {
 
 		);
 	}
+}
+
+class CreateDialog extends React.Component {
+
+	constructor(props) {
+		super(props);
+		this.handleSubmit = this.handleSubmit.bind(this);
+	}
+
+	handleSubmit(e) {
+		e.preventDefault();
+		const newDep = {};
+		this.props.attributes.forEach(attribute => {
+			newDep[attribute] = ReactDOM.findDOMNode(this.refs[attribute]).value.trim();
+		});
+		this.props.onCreate(newDep);
+
+		// clear out the dialog's inputs
+		this.props.attributes.forEach(attribute => {
+			ReactDOM.findDOMNode(this.refs[attribute]).value = '';
+		});
+
+		// Navigate away from the dialog to hide it.
+		window.location = "#";
+	}
+
+	render() {
+		const inputs = this.props.attributes.map(attribute =>
+			<p key={attribute}>
+				<input type="text" placeholder={attribute} ref={attribute} className="field"/>
+			</p>
+		);
+
+		return (
+			<div>
+				<a href="#createDep">Create</a>
+
+				<div id="createDep" className="modalDialog">
+					<div>
+						<a href="#" title="Close" className="close">X</a>
+
+						<h2>Create new Dep</h2>
+
+						<form>
+							{inputs}
+							<button onClick={this.handleSubmit}>Create</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		)
+	}
+
 }
 
 
