@@ -65,9 +65,9 @@ class Dep extends React.Component {
 
 	componentDidMount() {
 
-		var x = this.fetchData(this.props.dep._links.location.href);
-		console.log(x);
 		this.setState({location: this.fetchData(this.props.dep._links.location.href)});
+		//this.setState({release: this.fetchData(this.props.dep._links.release.href)});
+		//this.setState({environment: this.fetchData(this.props.dep._links.environment.href)});
 
 		fetch(this.props.dep._links.release.href)
 			.then(res => res.json())
@@ -97,8 +97,41 @@ class Dep extends React.Component {
 					});
 				}
 			);
+		fetch(this.props.dep._links.environment.href)
+			.then(res => res.json())
+			.then(
+				(result) => {
+					this.setState({
+						environment: result
+					});
+				},
+				(error) => {
+					this.setState({
+						error
+					});
+				}
+			);
+		fetch(this.props.dep._links.tasks.href)
+			.then(res => res.json())
+			.then(
+				(result) => {
+					//this.setState({
+					//	tasks: result
+					//});
+					this.setState({tasks: result._embedded.depTasks});
+
+				},
+				(error) => {
+					this.setState({
+						error
+					});
+				}
+			);
+
 
 	}
+
+
 
 	fetchData(link){
 		console.log("link: " + link);
@@ -115,6 +148,11 @@ class Dep extends React.Component {
 	};
 
 	render(){
+		const taskArray = this.state.tasks.map((singleTask) => {
+			return (
+				<p key={singleTask.short_description}>{singleTask.short_description}</p>
+			);
+		});
 		return(
 			<tr>
 				<td>{this.props.dep.id}</td>
@@ -124,6 +162,7 @@ class Dep extends React.Component {
 
 				<td>{this.state.release.release}</td>
 				<td>{this.state.environment.name}</td>
+				<td>{taskArray}</td>
 			</tr>
 
 		);
@@ -136,37 +175,3 @@ ReactDOM.render(
 	<App />,
 	document.getElementById('react')
 )
-// end::render[]
-/*
-
-class HelloReact extends React.Component {
-
-	//static defaultProps = { name: 'Dani' };
-
-	render(){
-		return(
-			<h1>
-				<Greeting welcome={this.props.welcome} /> {this.props.name}
-			</h1>
-		);
-	}
-}
-
-class Greeting extends React.Component {
-	render(){
-		if (this.props.welcome === true){
-			return(
-				<span>Hello</span>
-			);
-
-		} else {
-			return(
-				<span>byeeeee</span>
-			);
-
-		}
-	}
-}
-
-ReactDOM.render(<HelloReact name="elias" welcome={true} />, document.getElementById('react'));
-*/
