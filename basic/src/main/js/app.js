@@ -12,7 +12,7 @@ class App extends React.Component { // <1>
 
 	constructor(props) {
 		super(props);
-		this.state = {deps: [], attributes: [], links: {}};
+		this.state = {deps: [], depL:[], attributes: [], links: {}};
 	}
 
 	loadFromServer() {
@@ -44,7 +44,7 @@ class App extends React.Component { // <1>
 
 
 	onCreate(newDep) {
-		follow(client, root, ['deps']).then(depCollection => {
+		follow(client, root, ['depLs']).then(depCollection => {
 			return client({
 				method: 'POST',
 				path: depCollection.entity._links.self.href,
@@ -52,7 +52,7 @@ class App extends React.Component { // <1>
 				headers: {'Content-Type': 'application/json'}
 			})
 		}).done(response => {
-			return follow(client, root, ["deps"]);
+			return follow(client, root, ["depLs"]);
 		});
 	}
 
@@ -61,7 +61,7 @@ class App extends React.Component { // <1>
 			<div>
 				<CreateDialog attributes={this.state.attributes} onCreate={this.onCreate}/>
 				 <DepList deps={this.state.deps} />
-				<DepList deps={this.state.depL} />
+				<DepList deps={this.state.deps} />
 			</div>
 		)
 	}

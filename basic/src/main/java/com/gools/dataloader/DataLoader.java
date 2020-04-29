@@ -24,6 +24,9 @@ public class DataLoader implements CommandLineRunner {
     @Autowired private TaskOrderRepository tor;
     @Autowired private TaskStatusRepository tsr;
 
+    @Autowired
+    private DepLReporitory asdf;
+
     @Override
     public void run(String... args) throws Exception {
 
@@ -79,6 +82,7 @@ public class DataLoader implements CommandLineRunner {
         Date z = new Date(System.currentTimeMillis()+15);
        this.dr.save(new Dep(x, y, z, "comments yeet", "notes hehe", 1, r, l, e, ab));
 
+       this.asdf.save(new DepL("asdf", "penis", "dickhead", "", "", 1, "16.1", "gehg", "sdf", "asdf"));
     }
 
 }
